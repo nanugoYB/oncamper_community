@@ -212,12 +212,76 @@
                     }
                 }
             }
+        },
+        "/api/regions": {
+            "get": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "지역 목록을 가져오는 API",
+                "operationId": "b1879589856defd8996d0a4d13f5e8ca",
+                "responses": {
+                    "200": {
+                        "description": "성공적으로 지역 목록을 가져옴",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Seoul"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-12-17T00:00:00.000000Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-12-17T00:00:00.000000Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "지역 데이터를 찾을 수 없음",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No regions found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Regions",
+            "description": "Regions"
         }
     ]
 }

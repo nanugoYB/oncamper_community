@@ -10,17 +10,20 @@
         "version": "0.1"
     },
     "paths": {
-        "/api/register": {
+        "api/register": {
             "post": {
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "유저등록을 위한 API",
-                "operationId": "8a56853624e025573120a09a4c75d468",
+                "operationId": "ab2b7d41093853c1cd75e0410e4833e8",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "name": {
+                                    "user_name": {
                                         "type": "string",
                                         "example": "John Doe"
                                     },
@@ -54,7 +57,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "User registered successfully"
+                                            "example": "유저생성 완료"
                                         },
                                         "user": {
                                             "properties": {
@@ -62,7 +65,7 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "name": {
+                                                "user_name": {
                                                     "type": "string",
                                                     "example": "John Doe"
                                                 },
@@ -97,11 +100,11 @@
                                     "properties": {
                                         "errors": {
                                             "properties": {
-                                                "name": {
+                                                "user_name": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The name field is required."
+                                                        "example": "The user_name field is required."
                                                     }
                                                 },
                                                 "email": {
@@ -117,6 +120,13 @@
                                                         "type": "string",
                                                         "example": "The password field is required."
                                                     }
+                                                },
+                                                "password_confirmation": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The password confirmation does not match."
+                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -130,5 +140,11 @@
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        }
+    ]
 }

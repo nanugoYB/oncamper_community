@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -85,5 +86,54 @@ class AuthController extends Controller
         ], 201); // 성공시 201 상태 코드
     }
 
+
+    /**
+     * @OA\Post(
+     *     path="api/login",
+     *     summary="JWT 로그인을 위한 API",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="로그인 성공",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGci..."),
+     *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="로그인 실패",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Unauthorized")
+     *         )
+     *     )
+     * )
+     */
+    public function login(Request $request)
+    {
+        // 유효성 검사
+        $credentials = $request->only('email', 'password');
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    
+        // 토큰 반환
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60, // TTL 값 가져오기
+        ]);
+    }
     
 }

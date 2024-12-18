@@ -11,7 +11,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/regions', [RegionController::class, 'regions']);
 
 Route::get('/regions/gallery', [GalleryController::class, 'galleryList']);
-Route::post('/regions/gallery', [GalleryController::class, 'galleryAdd']); 
-Route::delete('/regions/gallery', [GalleryController::class, 'galleryDelete']);
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::post('/regions/gallery', [GalleryController::class, 'galleryAdd']);
+});
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::delete('/regions/gallery', [GalleryController::class, 'galleryAdd']);
+});
 
 ?>

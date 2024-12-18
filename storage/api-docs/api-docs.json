@@ -273,6 +273,323 @@
                 }
             }
         },
+        "api/regions/gallery": {
+            "post": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "갤러리 생성 API",
+                "operationId": "4c21ef2f22c98a1e5d6d752365fe4a62",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "region_id": {
+                                        "description": "갤러리가 속한 지역 ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "description": "갤러리 이름",
+                                        "type": "string",
+                                        "example": "Art Gallery"
+                                    },
+                                    "description": {
+                                        "description": "갤러리 설명",
+                                        "type": "string",
+                                        "example": "This is an art gallery."
+                                    },
+                                    "manager_id": {
+                                        "description": "갤러리 관리자의 ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "sub_manager_1": {
+                                        "description": "서브 매니저 1의 ID",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "sub_manager_2": {
+                                        "description": "서브 매니저 2의 ID",
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "sub_manager_3": {
+                                        "description": "서브 매니저 3의 ID",
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "sub_manager_4": {
+                                        "description": "서브 매니저 4의 ID",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "sub_manager_5": {
+                                        "description": "서브 매니저 5의 ID",
+                                        "type": "integer",
+                                        "example": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "갤러리 생성 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "갤러리 생성 완료"
+                                        },
+                                        "gallery_info": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "갤러리 ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "region_id": {
+                                                    "description": "갤러리 지역 ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "description": "갤러리 이름",
+                                                    "type": "string",
+                                                    "example": "Art Gallery"
+                                                },
+                                                "description": {
+                                                    "description": "갤러리 설명",
+                                                    "type": "string",
+                                                    "example": "This is an art gallery."
+                                                },
+                                                "manager_id": {
+                                                    "description": "갤러리 관리자의 ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "sub_manager_1": {
+                                                    "description": "서브 매니저 1의 ID",
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "sub_manager_2": {
+                                                    "description": "서브 매니저 2의 ID",
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "sub_manager_3": {
+                                                    "description": "서브 매니저 3의 ID",
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "sub_manager_4": {
+                                                    "description": "서브 매니저 4의 ID",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "sub_manager_5": {
+                                                    "description": "서브 매니저 5의 ID",
+                                                    "type": "integer",
+                                                    "example": 6
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-12-18T00:00:00.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-12-18T00:00:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "유효성 검사 실패",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "갤러리 삭제 API",
+                "operationId": "1daa7e51f824078bf98998a00e1d9143",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "region_id": {
+                                        "description": "갤러리가 속한 지역 ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "gallery_id": {
+                                        "description": "삭제하려는 갤러리 ID",
+                                        "type": "integer",
+                                        "example": 101
+                                    },
+                                    "manager_id": {
+                                        "description": "갤러리를 관리하는 매니저의 ID",
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "갤러리 삭제 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "갤러리가 삭제되었습니다."
+                                        },
+                                        "deleted_gallery": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "삭제된 갤러리의 ID",
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "region_id": {
+                                                    "description": "갤러리의 지역 ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "description": "갤러리 이름",
+                                                    "type": "string",
+                                                    "example": "Art Gallery"
+                                                },
+                                                "description": {
+                                                    "description": "갤러리 설명",
+                                                    "type": "string",
+                                                    "example": "A beautiful gallery"
+                                                },
+                                                "manager_id": {
+                                                    "description": "매니저의 ID",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "삭제 권한 없음",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "권한이 없습니다. 갤러리를 삭제할 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "갤러리 찾을 수 없음",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "해당 갤러리를 찾을 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "잘못된 요청 데이터",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "properties": {
+                                                "region_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The region_id field is required."
+                                                    }
+                                                },
+                                                "gallery_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The gallery_id field is required."
+                                                    }
+                                                },
+                                                "manager_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The manager_id field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/regions": {
             "get": {
                 "tags": [

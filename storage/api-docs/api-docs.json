@@ -1062,6 +1062,132 @@
                 }
             }
         },
+        "/api/post/update": {
+            "put": {
+                "tags": [
+                    "Gallery Posts"
+                ],
+                "summary": "게시글 수정",
+                "description": "특정 갤러리의 게시글을 수정합니다.",
+                "operationId": "0f490b89b813aa73bc1355204d7b52a8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gallery_id",
+                                    "post_id",
+                                    "user_id",
+                                    "user_name",
+                                    "title",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "gallery_id": {
+                                        "description": "갤러리 ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "post_id": {
+                                        "description": "수정할 게시글의 ID",
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "user_id": {
+                                        "description": "게시글을 수정할 사용자 ID",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "user_name": {
+                                        "description": "사용자 이름",
+                                        "type": "string",
+                                        "example": "user_name"
+                                    },
+                                    "title": {
+                                        "description": "게시글 제목",
+                                        "type": "string",
+                                        "example": "게시글 제목"
+                                    },
+                                    "content": {
+                                        "description": "게시글 내용",
+                                        "type": "string",
+                                        "example": "<p>게시글 내용</p>"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "게시글 수정 완료",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글 수정이 완료되었습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "권한이 없는 사용자",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글을 수정할 권한이 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "게시글을 찾을 수 없음",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "해당 게시글을 찾을 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "유효성 검사 실패",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/regions": {
             "get": {
                 "tags": [

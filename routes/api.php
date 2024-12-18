@@ -26,4 +26,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/regions/gallery/post', [GalleryController::class, 'postDelete']);
 });
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::put('/regions/gallery/post', [GalleryController::class, 'postUpdate']);
+});
 ?>

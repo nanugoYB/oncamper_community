@@ -520,4 +520,125 @@ class GalleryPostController extends Controller
             'message' => '갤러리가 삭제되었습니다.'
         ], 200);
     }
+
+/**
+ * @OA\Put(
+ *     path="/api/post/update",
+ *     summary="게시글 수정",
+ *     description="특정 갤러리의 게시글을 수정합니다.",
+ *     tags={"Gallery Posts"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"gallery_id", "post_id", "user_id", "user_name", "title", "content"},
+ *             @OA\Property(property="gallery_id", type="integer", example=1, description="갤러리 ID"),
+ *             @OA\Property(property="post_id", type="integer", example=10, description="수정할 게시글의 ID"),
+ *             @OA\Property(property="user_id", type="integer", example=5, description="게시글을 수정할 사용자 ID"),
+ *             @OA\Property(property="user_name", type="string", example="user_name", description="사용자 이름"),
+ *             @OA\Property(property="title", type="string", example="게시글 제목", description="게시글 제목"),
+ *             @OA\Property(property="content", type="string", example="<p>게시글 내용</p>", description="게시글 내용")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="게시글 수정 완료",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="글 수정이 완료되었습니다.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="권한이 없는 사용자",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="글을 수정할 권한이 없습니다.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="게시글을 찾을 수 없음",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="해당 게시글을 찾을 수 없습니다.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="유효성 검사 실패",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="부적절한 접근입니다.")
+ *         )
+ *     )
+ * )
+ */
+
+    public function postUpdate(Request $request): JsonResponse 
+    {
+        $validator = Validator::make($request->all(), [
+            'gallery_id' => 'required|numeric',
+            'post_id' => 'required|numeric',
+            'user_id' => 'required|numeric',
+            'user_name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'content' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            $errors = $validator->errors();
+
+            if($errors->has('gallery_id')){
+                return response()->json([
+                    'error' => '부적절한 접근입니다.'
+                ],422);
+            }
+
+            if($errors->has('post_id')){
+                return response()->json([
+                    'error' => '게시글이 존재하지 않습니다.'
+                ],422);
+            }
+
+            if($errors->has('user_id')){
+                return response()->json([
+                    'error' => '글 작성자만 지울 수 있습니다.'
+                ],422);
+            }
+        }
+
+        $gallery_id = $request->gallery_id;   
+        $post_id = $request->post_id;
+        $user_id = $request->user_id;
+
+         //purifier를 통해서 content 내부의 위험요소 제거 (script, img의 src중 서버에 없는 src등)
+         $content = $this->purifier->clean($request->input('content'));
+
+        $post = DB::table('gallery_posts')
+        ->where('gallery_id', $gallery_id)
+        ->where('id', $post_id) 
+        ->first();
+
+        if (!$post) {
+            return response()->json([
+                'message' => '해당 게시글을 찾을 수 없습니다.'
+            ], 404);
+        }
+
+        if ($post->user_id != $user_id) {
+            return response()->json([
+                'message' => '글을 수정할 권한이 없습니다.'
+            ], 403);
+        }
+
+        DB::table('gallery_posts')
+        ->where('id', $post_id)
+        ->update([
+            'title' => $request->title,
+            'content' => $content,
+            'updated_at' => now(),  
+        ]);
+
+
+        return response()->json([
+            'message' => '글 수정이 완료되었습니다.'
+        ], 200);
+    }
+
 }

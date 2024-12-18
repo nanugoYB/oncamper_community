@@ -6,148 +6,518 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
-use App\Models\Gallery;
-
+use App\Models\GalleryPost;
+use Mews\Purifier\Purifier;
 
 class GalleryPostController extends Controller
 {
+    protected $purifier;
 
-    public function galleryList(Request $request)
+    public function __construct(Purifier $purifier)
+{
+    $this->purifier = $purifier;
+}
+    /**
+ * @OA\Get(
+ *     path="/api/regions/gallery/postList",
+ *     summary="Get paginated list of gallery posts",
+ *     description="Retrieve a paginated list of posts for a specific gallery based on gallery_id.",
+ *     operationId="getGalleryPosts",
+ *     tags={"Gallery Posts"},
+ *     @OA\Parameter(
+ *         name="gallery_id",
+ *         in="query",
+ *         description="ID of the gallery for which posts are to be retrieved",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer",
+ *             example=1
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="page",
+ *         in="query",
+ *         description="Page number for pagination",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="integer",
+ *             example=1
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful response containing paginated gallery posts",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="current_page", type="integer", description="Current page number"),
+ *             @OA\Property(property="data", type="array", description="List of gallery posts", @OA\Items(
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", description="Post ID"),
+ *                 @OA\Property(property="gallery_id", type="integer", description="Gallery ID"),
+ *                 @OA\Property(property="user_id", type="integer", description="User ID of the post author"),
+ *                 @OA\Property(property="user_name", type="string", description="Username of the post author"),
+ *                 @OA\Property(property="title", type="string", description="Title of the post"),
+ *                 @OA\Property(property="content", type="string", description="Content of the post"),
+ *                 @OA\Property(property="views", type="integer", description="View count of the post"),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", description="Post creation timestamp"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time", description="Post update timestamp")
+ *             )),
+ *             @OA\Property(property="first_page_url", type="string", description="URL of the first page"),
+ *             @OA\Property(property="last_page", type="integer", description="Last page number"),
+ *             @OA\Property(property="last_page_url", type="string", description="URL of the last page"),
+ *             @OA\Property(property="next_page_url", type="string", nullable=true, description="URL of the next page"),
+ *             @OA\Property(property="prev_page_url", type="string", nullable=true, description="URL of the previous page"),
+ *             @OA\Property(property="total", type="integer", description="Total number of posts"),
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation error",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="error", type="string", example="부적절한 접근입니다.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="No posts found",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="게시글이 존재하지 않습니다")
+ *         )
+ *     ),
+ *     security={
+ *         {"bearerAuth": {}}
+ *     }
+ * )
+ */
+
+    public function postList(Request $request)
     {      
         $validator = Validator::make($request->all(), [
-            'region_id' => 'required|numeric',
+            'gallery_id' => 'required|numeric'
         ]);
 
         if($validator->fails()) {
             $errors = $validator->errors();
 
-            if($errors->has('region_id')){
+            if($errors->has('gallery_id')){
                 return response()->json([
                     'error' => '부적절한 접근입니다.'
                 ],422);
             }
         }
         
-        $region_id = $request->region_id;
+        $perPage = 10;
 
-        $galleries = DB::table('galleries')
-        ->where('region_id', $region_id)
-        ->get();
+        $gallery_posts = DB::table('gallery_posts')
+        ->where('gallery_id', $request->gallery_id)
+        ->orderBy('created_at', 'desc') // 최신 게시글부터 정렬
+        ->paginate($perPage); // 페이지네이션 적용
 
-        if ($galleries->isEmpty()) {
+
+        if ($gallery_posts->isEmpty()) {
             return response()->json([
-                'message' => '갤러리가 존재하지 않습니다.'
+                'message' => '게시글이 존재하지 않습니다'
             ], 500); 
         }
 
-        return response()->json($galleries);
+        return response()->json($gallery_posts);
     }
 
+/**
+ * @OA\Get(
+ *     path="/api/regions/gallery/post",
+ *     summary="게시글 조회",
+ *     description="게시글을 조회하고 조회수를 증가시킵니다.",
+ *     tags={"Gallery Posts"},
+ *     @OA\Parameter(
+ *         name="gallery_id",
+ *         in="query",
+ *         description="갤러리 ID",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="post_id",
+ *         in="query",
+ *         description="게시글 ID",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="게시글 조회 성공 및 조회수 증가",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="id",
+ *                 type="integer",
+ *                 description="게시글 ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="gallery_id",
+ *                 type="integer",
+ *                 description="갤러리 ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="user_name",
+ *                 type="string",
+ *                 description="글쓴 유저 이름"
+ *             ),
+ *             @OA\Property(
+ *                 property="content",
+ *                 type="string",
+ *                 description="게시글 내용"
+ *             ),
+ *             @OA\Property(
+ *                 property="views",
+ *                 type="integer",
+ *                 description="조회수"
+ *             ),
+ *             @OA\Property(
+ *                 property="created_at",
+ *                 type="string",
+ *                 format="date-time",
+ *                 description="게시글 생성 시간"
+ *             ),
+ *             @OA\Property(
+ *                 property="updated_at",
+ *                 type="string",
+ *                 format="date-time",
+ *                 description="게시글 수정 시간"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="부적절한 요청 (gallery_id 또는 post_id 누락)",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="error",
+ *                 type="string",
+ *                 example="부적절한 접근입니다."
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="게시글을 찾을 수 없음",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="게시글이 존재하지 않습니다"
+ *             )
+ *         )
+ *     )
+ * )
+ */
 
 
-
-    public function galleryAdd(Request $request): JsonResponse
-    {
+    public function viewPost(Request $request)
+    {      
         $validator = Validator::make($request->all(), [
-            'region_id' => 'required|numeric',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'manager_id' => 'required|numeric',
-            'sub_manager_1' => 'numeric',
-            'sub_manager_2' => 'numeric',
-            'sub_manager_3' => 'numeric',
-            'sub_manager_4' => 'numeric',
-            'sub_manager_5' => 'numeric',
+            'gallery_id' => 'required|numeric',
+            'post_id' => 'required|numeric',
         ]);
 
         if($validator->fails()) {
             $errors = $validator->errors();
 
-            if($errors->has('region_id')){
+            if($errors->has('gallery_id')){
                 return response()->json([
                     'error' => '부적절한 접근입니다.'
                 ],422);
             }
 
-            if($errors->has('name')){
+            if($errors->has('post_id')){
                 return response()->json([
-                    'error' => '갤러리 이름은 필수 입력값입니다.'
+                    'error' => '게시글이 존재하지 않습니다.'
+                ],422);
+            }
+        }
+        
+
+        $gallery_post = DB::table('gallery_posts')
+        ->where('gallery_id', $request->gallery_id)
+        ->where('id', $request->post_id)
+        ->get();
+
+        if ($gallery_post->isEmpty()) {
+            return response()->json([
+                'message' => '게시글이 존재하지 않습니다'
+            ], 500); 
+        }
+
+        DB::table('gallery_posts')
+        ->where('gallery_id', $request->gallery_id)
+        ->where('id', $request->post_id)
+        ->increment('views'); // views 컬럼 값 1 증가
+
+
+        return response()->json($gallery_post);
+    }
+
+/**
+ * @OA\Post(
+ *     path="/api/regions/gallery/post",
+ *     summary="게시글 추가",
+ *     description="새로운 게시글을 추가합니다.",
+ *     tags={"Gallery Posts"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             required={"gallery_id", "user_id", "user_name", "title", "content"},
+ *             @OA\Property(
+ *                 property="gallery_id",
+ *                 type="integer",
+ *                 description="갤러리 ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="user_id",
+ *                 type="integer",
+ *                 description="유저 ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="user_name",
+ *                 type="string",
+ *                 description="유저 이름"
+ *             ),
+ *             @OA\Property(
+ *                 property="title",
+ *                 type="string",
+ *                 description="게시글 제목"
+ *             ),
+ *             @OA\Property(
+ *                 property="content",
+ *                 type="string",
+ *                 description="게시글 내용"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="게시글 생성 성공",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="게시글 생성 완료"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="유효하지 않은 입력 데이터",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="error",
+ *                 type="string",
+ *                 example="부적절한 접근입니다."
+ *             )
+ *         )
+ *     )
+ * )
+ */
+
+    public function postAdd(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'gallery_id' => 'required|numeric',
+            'user_id' => 'required|numeric',
+            'user_name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'content' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            $errors = $validator->errors();
+
+            if($errors->has('gallery_id')){
+                return response()->json([
+                    'error' => '부적절한 접근입니다.'
                 ],422);
             }
 
-            if($errors->has('description')){
-                return response()->json([
-                    'error' => '갤러리에 대한 간략한 설명을 적어주세요.'
-                ],422);
-            }
-
-            if($errors->has('manager_id')){
+            if($errors->has('user_id')){
                 return response()->json([
                     'error' => '로그인 후 이용해주세요.'
                 ],422);
-                //이후 리다이렉트 하도록 하는것도 괜찮을듯?
+            }
+
+            if($errors->has('user_name')){
+                return response()->json([
+                    'error' => '유저 네임이 없습니다.'
+                ],422);
+            }
+
+            if($errors->has('title')){
+                return response()->json([
+                    'error' => '제목을 입력해주세요'
+                ],422);
+            }
+
+            if($errors->has('content')){
+                return response()->json([
+                    'error' => '내용을 입력해주세요'
+                ],422);
             }
         }
 
-        $gallery = Gallery::create([
-            'region_id' => $request->region_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'manager_id' => $request->manager_id, 
-            'sub_manager_1' => $request->sub_manager_1,
-            'sub_manager_2' => $request->sub_manager_2,
-            'sub_manager_3' => $request->sub_manager_3,
-            'sub_manager_4' => $request->sub_manager_4,
-            'sub_manager_5' => $request->sub_manager_5,
-        ]);
+        //purifier를 통해서 content 내부의 위험요소 제거 (script, img의 src중 서버에 없는 src등)
+        $content = $this->purifier->clean($request->input('content'));
+
+        $galleryPost = GalleryPost::create([
+            'gallery_id' => $request->gallery_id,
+            'user_id' => $request->user_id,
+            'user_name' => $request->user_name,
+            'title' => $request->title, 
+            'content' => $content
+        ]); 
 
         return response()->json([
-            'message' => '갤러리 생성 완료',
-            'gallery_info' => $gallery
+            'message' => '게시글 생성 완료' 
         ], 201);
 
     }
 
  
-    public function galleryDelete(Request $request): JsonResponse 
+/**
+ * @OA\Delete(
+ *     path="/api/regions/gallery/post",
+ *     summary="게시글 삭제",
+ *     description="사용자가 작성한 게시글을 삭제합니다.",
+ *     tags={"Gallery Posts"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             type="object",
+ *             required={"gallery_id", "user_id"},
+ *             @OA\Property(
+ *                 property="gallery_id",
+ *                 type="integer",
+ *                 description="갤러리 ID"
+ *             ),
+ *             @OA\Property(
+ *                 property="user_id",
+ *                 type="integer",
+ *                 description="사용자 ID (게시글 작성자 ID)"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="게시글 삭제 성공",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="갤러리가 삭제되었습니다."
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="유효하지 않은 입력 데이터",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="error",
+ *                 type="string",
+ *                 example="부적절한 접근입니다."
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=403,
+ *         description="삭제 권한이 없음",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="글을 삭제할 권한이 없습니다."
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="게시글을 찾을 수 없음",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="해당 게시글을 찾을 수 없습니다."
+ *             )
+ *         )
+ *     )
+ * )
+ */
+
+    public function postDelete(Request $request): JsonResponse 
     {
         $validator = Validator::make($request->all(), [
-            'region_id' => 'required|numeric',
             'gallery_id' => 'required|numeric',
-            'manager_id' => 'required|numeric',
+            'user_id' => 'required|numeric',
         ]);
 
-        $region_id = $request->region_id;
-        $gallery_id = $request->gallery_id;   
-        $manager_id = $request->manager_id;
+        if($validator->fails()) {
+            $errors = $validator->errors();
 
-        $gallery = DB::table('galleries')
-        ->where('region_id', $region_id)
-        ->where('id', $gallery_id) 
+            if($errors->has('gallery_id')){
+                return response()->json([
+                    'error' => '부적절한 접근입니다.'
+                ],422);
+            }
+
+            if($errors->has('user_id')){
+                return response()->json([
+                    'error' => '글 작성자만 지울 수 있습니다.'
+                ],422);
+            }
+        }
+
+        $gallery_id = $request->gallery_id;   
+        $user_id = $request->user_id;
+
+        $post = DB::table('gallery_posts')
+        ->where('gallery_id', $gallery_id)
+        ->where('user_id', $user_id) 
         ->first();
-        
-        if (!$gallery) {
+
+        if (!$post) {
             return response()->json([
-                'message' => '해당 갤러리를 찾을 수 없습니다.'
+                'message' => '해당 게시글을 찾을 수 없습니다.'
             ], 404);
         }
 
-        if ($gallery->manager_id != $manager_id) {
+        if ($post->user_id != $user_id) {
             return response()->json([
-                'message' => '권한이 없습니다. 갤러리를 삭제할 수 없습니다.'
+                'message' => '글을 삭제할 권한이 없습니다.'
             ], 403);
         }
 
         
-        DB::table('galleries')
-        ->where('region_id', $region_id)
-        ->where('id', $gallery_id)
+        DB::table('gallery_posts')
+        ->where('id', $post->id)
+        ->where('user_id', $user_id)
         ->delete();
 
 
         return response()->json([
-            'message' => '갤러리가 삭제되었습니다.',
-            'deleted_gallery' => $gallery,
+            'message' => '갤러리가 삭제되었습니다.'
         ], 200);
     }
 }

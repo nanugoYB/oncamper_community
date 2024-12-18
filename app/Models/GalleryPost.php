@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class GalleryPost extends Model
 {
     //
-    protected $table = 'galleries';
+    protected $table = 'gallery_posts';
 
     protected $fillable = [
-        'region_id', 'name', 'description', 'manager_id', 
-        'sub_manager_1', 'sub_manager_2', 'sub_manager_3', 
-        'sub_manager_4', 'sub_manager_5'
+        'gallery_id', 'user_id', 'user_name', 'title', 
+        'content', 'views'
     ];
 
     public $timestamps = true;

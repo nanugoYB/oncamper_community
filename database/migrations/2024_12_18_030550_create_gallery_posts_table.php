@@ -18,6 +18,7 @@ class CreateGalleryPostsTable extends Migration
             $table->foreignId('gallery_id')->constrained()->onDelete('cascade'); // 갤러리 ID (foreign key)
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // 글쓴유저 ID (foreign key)
             $table->string('user_name'); // 글쓴유저 유저네임
+            $table->string('title'); // 게시글 제목 (string 타입)
             $table->text('content'); // 글 내용 (HTML 포함 가능)
             $table->integer('views')->default(0); // 조회수 (기본값 0)
             $table->timestamps(); // created_at, updated_at

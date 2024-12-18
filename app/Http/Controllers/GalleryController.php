@@ -11,23 +11,43 @@ use App\Models\Gallery;
 
 class GalleryController extends Controller
 {
-    /**
+/**
  * @OA\Get(
- *     path="/api/regions/gallery",
- *     summary="갤러리 목록 조회",
+ *     path="api/regions/gallery",
+ *     summary="특정 지역의 갤러리 리스트 조회",
  *     tags={"Gallery"},
+ *     @OA\Parameter(
+ *         name="region_id",
+ *         in="query",
+ *         required=true,
+ *         description="조회할 갤러리가 속한 지역의 ID",
+ *         @OA\Schema(type="integer")
+ *     ),
  *     @OA\Response(
  *         response=200,
- *         description="갤러리 목록이 성공적으로 반환됨",
+ *         description="성공적으로 갤러리 리스트를 가져옴",
  *         @OA\JsonContent(
  *             type="array",
  *             @OA\Items(
  *                 type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="name", type="string", example="Summer Collection"),
- *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-12-17T00:00:00.000000Z"),
- *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-17T00:00:00.000000Z")
+ *                 properties={
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="region_id", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="Art Gallery"),
+ *                     @OA\Property(property="description", type="string", example="A place for art exhibitions"),
+ *                     @OA\Property(property="manager_id", type="integer", example=5),
+ *                 }
  *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="잘못된 요청 파라미터",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             properties={
+ *                 @OA\Property(property="error", type="string", example="부적절한 접근입니다.")
+ *             }
  *         )
  *     ),
  *     @OA\Response(
@@ -35,14 +55,34 @@ class GalleryController extends Controller
  *         description="갤러리가 존재하지 않음",
  *         @OA\JsonContent(
  *             type="object",
- *             @OA\Property(property="message", type="string", example="갤러리가 존재하지 않습니다.")
+ *             properties={
+ *                 @OA\Property(property="message", type="string", example="갤러리가 존재하지 않습니다.")
+ *             }
  *         )
  *     )
  * )
  */
-    public function galleryList()
-    {
-        $galleries = DB::table('galleries')->get();
+    public function galleryList(Request $request)
+    {      
+        $validator = Validator::make($request->all(), [
+            'region_id' => 'required|numeric',
+        ]);
+
+        if($validator->fails()) {
+            $errors = $validator->errors();
+
+            if($errors->has('region_id')){
+                return response()->json([
+                    'error' => '부적절한 접근입니다.'
+                ],422);
+            }
+        }
+        
+        $region_id = $request->region_id;
+
+        $galleries = DB::table('galleries')
+        ->where('region_id', $region_id)
+        ->get();
 
         if ($galleries->isEmpty()) {
             return response()->json([

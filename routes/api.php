@@ -18,4 +18,5 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/regions/gallery', [GalleryController::class, 'galleryAdd']);
 });
 
+
 ?>

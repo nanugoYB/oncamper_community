@@ -13,7 +13,7 @@ class GalleryController extends Controller
 {
 /**
  * @OA\Get(
- *     path="api/regions/gallery",
+ *     path="api/regions/galleryList",
  *     summary="특정 지역의 갤러리 리스트 조회",
  *     tags={"Gallery"},
  *     @OA\Parameter(

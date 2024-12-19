@@ -523,7 +523,7 @@ class GalleryPostController extends Controller
 
 /**
  * @OA\Put(
- *     path="/api/post/update",
+ *     path="/api/regions/gallery/post",
  *     summary="게시글 수정",
  *     description="특정 갤러리의 게시글을 수정합니다.",
  *     tags={"Gallery Posts"},

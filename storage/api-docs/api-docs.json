@@ -213,13 +213,434 @@
                 }
             }
         },
-        "api/regions/gallery": {
+        "/api/regions/gallery/post/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "특정 게시물에 대한 코멘트 조회",
+                "description": "주어진 post_id를 기반으로 특정 게시물의 코멘트를 조회합니다.",
+                "operationId": "viewComment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "post_id"
+                                ],
+                                "properties": {
+                                    "post_id": {
+                                        "description": "게시물의 ID",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "코멘트가 존재하는 경우 코멘트를 반환합니다.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "코멘트가 존재하지 않습니다."
+                                                },
+                                                "comment_status": {
+                                                    "type": "string",
+                                                    "example": "0"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "description": "코멘트 ID",
+                                                        "type": "integer"
+                                                    },
+                                                    "post_id": {
+                                                        "description": "게시물 ID",
+                                                        "type": "integer"
+                                                    },
+                                                    "user_id": {
+                                                        "description": "코멘트를 작성한 유저 ID",
+                                                        "type": "integer"
+                                                    },
+                                                    "content": {
+                                                        "description": "코멘트 내용",
+                                                        "type": "string"
+                                                    },
+                                                    "created_at": {
+                                                        "description": "코멘트 작성 시간",
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "잘못된 요청 (post_id가 누락되었거나 잘못되었습니다)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "코멘트 수정",
+                "description": "주어진 코멘트 ID와 비밀번호를 이용해 특정 코멘트를 수정합니다. 코멘트 작성자만 수정할 수 있습니다.",
+                "operationId": "commentUpdate",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "post_id",
+                                    "comment_id",
+                                    "user_id",
+                                    "password",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "post_id": {
+                                        "description": "게시물의 ID",
+                                        "type": "integer"
+                                    },
+                                    "comment_id": {
+                                        "description": "수정할 코멘트의 ID",
+                                        "type": "integer"
+                                    },
+                                    "user_id": {
+                                        "description": "사용자 ID",
+                                        "type": "integer"
+                                    },
+                                    "password": {
+                                        "description": "코멘트 비밀번호",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "description": "수정할 코멘트 내용",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "코멘트가 성공적으로 수정되었습니다.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글 수정이 완료되었습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "해당 코멘트를 찾을 수 없는 경우",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "해당 게시글을 찾을 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "수정 권한이 없는 경우",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글을 수정할 권한이 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "잘못된 요청이 있을 경우 발생하는 오류",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "새로운 코멘트 추가",
+                "description": "새로운 코멘트를 추가합니다. 코멘트에는 게시물 ID, 사용자 ID, 내용, 비밀번호 등의 정보가 필요합니다.",
+                "operationId": "commentAdd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "post_id",
+                                    "user_id",
+                                    "content",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "post_id": {
+                                        "description": "게시물의 ID",
+                                        "type": "integer"
+                                    },
+                                    "user_id": {
+                                        "description": "사용자 ID",
+                                        "type": "integer"
+                                    },
+                                    "user_name": {
+                                        "description": "사용자 이름 (선택 사항)",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "description": "코멘트 내용",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "description": "코멘트 비밀번호",
+                                        "type": "string"
+                                    },
+                                    "parent_comment_id": {
+                                        "description": "부모 코멘트 ID (선택 사항)",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "코멘트가 성공적으로 추가되었습니다.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "게시글 생성 완료"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "입력 값에 오류가 있을 경우 발생하는 오류.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "코멘트 삭제",
+                "description": "주어진 코멘트 ID와 비밀번호를 이용해 특정 코멘트를 삭제합니다. 코멘트 작성자만 삭제할 수 있습니다.",
+                "operationId": "commentDelete",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "post_id",
+                                    "comment_id",
+                                    "user_id",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "post_id": {
+                                        "description": "게시물의 ID",
+                                        "type": "integer"
+                                    },
+                                    "comment_id": {
+                                        "description": "삭제할 코멘트의 ID",
+                                        "type": "integer"
+                                    },
+                                    "user_id": {
+                                        "description": "사용자 ID",
+                                        "type": "integer"
+                                    },
+                                    "password": {
+                                        "description": "코멘트 비밀번호",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "코멘트가 성공적으로 삭제되었습니다.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "코멘트가 삭제되었습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "해당 코멘트를 찾을 수 없는 경우",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "해당 코멘트를 찾을 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "삭제 권한이 없는 경우",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글을 삭제할 권한이 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "잘못된 요청이 있을 경우 발생하는 오류",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "402": {
+                        "description": "비밀번호가 올바르지 않은 경우 발생하는 오류",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "비밀번호가 올바르지 않습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api/regions/galleryList": {
             "get": {
                 "tags": [
                     "Gallery"
                 ],
                 "summary": "특정 지역의 갤러리 리스트 조회",
-                "operationId": "ea3bca5634c1ade85096993b3e91aa4f",
+                "operationId": "2754fa0a1f9eb2aa9440009a339a186e",
                 "parameters": [
                     {
                         "name": "region_id",
@@ -300,7 +721,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "api/regions/gallery": {
             "post": {
                 "tags": [
                     "Gallery"
@@ -882,6 +1305,130 @@
                     }
                 }
             },
+            "put": {
+                "tags": [
+                    "Gallery Posts"
+                ],
+                "summary": "게시글 수정",
+                "description": "특정 갤러리의 게시글을 수정합니다.",
+                "operationId": "d967e9edfc3e7f6c7af8c9100845810c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gallery_id",
+                                    "post_id",
+                                    "user_id",
+                                    "user_name",
+                                    "title",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "gallery_id": {
+                                        "description": "갤러리 ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "post_id": {
+                                        "description": "수정할 게시글의 ID",
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "user_id": {
+                                        "description": "게시글을 수정할 사용자 ID",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "user_name": {
+                                        "description": "사용자 이름",
+                                        "type": "string",
+                                        "example": "user_name"
+                                    },
+                                    "title": {
+                                        "description": "게시글 제목",
+                                        "type": "string",
+                                        "example": "게시글 제목"
+                                    },
+                                    "content": {
+                                        "description": "게시글 내용",
+                                        "type": "string",
+                                        "example": "<p>게시글 내용</p>"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "게시글 수정 완료",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글 수정이 완료되었습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "권한이 없는 사용자",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "글을 수정할 권한이 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "게시글을 찾을 수 없음",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "해당 게시글을 찾을 수 없습니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "유효성 검사 실패",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "부적절한 접근입니다."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "Gallery Posts"
@@ -1062,132 +1609,6 @@
                 }
             }
         },
-        "/api/post/update": {
-            "put": {
-                "tags": [
-                    "Gallery Posts"
-                ],
-                "summary": "게시글 수정",
-                "description": "특정 갤러리의 게시글을 수정합니다.",
-                "operationId": "0f490b89b813aa73bc1355204d7b52a8",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "gallery_id",
-                                    "post_id",
-                                    "user_id",
-                                    "user_name",
-                                    "title",
-                                    "content"
-                                ],
-                                "properties": {
-                                    "gallery_id": {
-                                        "description": "갤러리 ID",
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "post_id": {
-                                        "description": "수정할 게시글의 ID",
-                                        "type": "integer",
-                                        "example": 10
-                                    },
-                                    "user_id": {
-                                        "description": "게시글을 수정할 사용자 ID",
-                                        "type": "integer",
-                                        "example": 5
-                                    },
-                                    "user_name": {
-                                        "description": "사용자 이름",
-                                        "type": "string",
-                                        "example": "user_name"
-                                    },
-                                    "title": {
-                                        "description": "게시글 제목",
-                                        "type": "string",
-                                        "example": "게시글 제목"
-                                    },
-                                    "content": {
-                                        "description": "게시글 내용",
-                                        "type": "string",
-                                        "example": "<p>게시글 내용</p>"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "게시글 수정 완료",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "글 수정이 완료되었습니다."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "권한이 없는 사용자",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "글을 수정할 권한이 없습니다."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "게시글을 찾을 수 없음",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "해당 게시글을 찾을 수 없습니다."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "유효성 검사 실패",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "부적절한 접근입니다."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/regions": {
             "get": {
                 "tags": [
@@ -1253,6 +1674,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Comments",
+            "description": "Comments"
         },
         {
             "name": "Gallery",

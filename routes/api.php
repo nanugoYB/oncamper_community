@@ -38,10 +38,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/regions/gallery/post', [GalleryController::class, 'postUpdate']);
 });
 
+
 //코멘트 라우팅
 Route::get('/regions/gallery/post/comments', [GalleryController::class, 'viewComment']);
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('/regions/gallery/post/comments', [GalleryController::class, 'postComment']);
+    Route::post('/regions/gallery/post/comments', [GalleryController::class, 'commentAdd']);
 });
 Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/regions/gallery/post/comments', [GalleryController::class, 'commentDelete']);

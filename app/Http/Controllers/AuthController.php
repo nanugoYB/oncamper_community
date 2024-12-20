@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -127,13 +128,39 @@ class AuthController extends Controller
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        $user = DB::table('users')
+        ->where('email', $request->email)
+        ->first();
+
+
+        if (!$user) {
+            return response()->json(['message' => '계정이 존재하지 않습니다.'], 401);
+        }
+        
+        if (Hash::check($request->password, $user->password)) {
+            
+        } else {
+            
+            return response()->json(['message' => '비밀번호가 동일하지 않습니다.'], 401);
+        }
     
+
         // 토큰 반환
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
+            'user_id' => $user->id,
             'expires_in' => JWTAuth::factory()->getTTL() * 60, // TTL 값 가져오기
         ]);
+    }
+
+    
+    public function logout()
+    {
+        JWTAuth::invalidate(JWTAuth::getToken());
+
+        return response()->json(['message' => '성공적으로 로그아웃 되었습니다.']);
     }
     
 }

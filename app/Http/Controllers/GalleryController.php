@@ -190,6 +190,7 @@ class GalleryController extends Controller
             }
         }
 
+
         $gallery = Gallery::create([
             'region_id' => $request->region_id,
             'name' => $request->name,

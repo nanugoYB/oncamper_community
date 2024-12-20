@@ -108,6 +108,7 @@ class AuthController extends Controller
      *             type="object",
      *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGci..."),
      *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *             @OA\Property(property="user_id", type="int", example="1"),
      *             @OA\Property(property="expires_in", type="integer", example=3600)
      *         )
      *     ),

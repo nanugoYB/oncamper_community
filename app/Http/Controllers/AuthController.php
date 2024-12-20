@@ -175,14 +175,6 @@ class AuthController extends Controller
  *             @OA\Property(property="message", type="string", example="성공적으로 로그아웃 되었습니다.")
  *         )
  *     ),
- *     @OA\Response(
- *         response=401,
- *         description="유효하지 않은 토큰입니다.",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="error", type="string", example="Unauthorized")
- *         )
- *     )
  * )
  */
 

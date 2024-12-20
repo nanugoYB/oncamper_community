@@ -188,6 +188,10 @@
                                             "type": "integer",
                                             "example": "1"
                                         },
+                                        "user_name": {
+                                            "type": "string",
+                                            "example": "test_user_name"
+                                        },
                                         "expires_in": {
                                             "type": "integer",
                                             "example": 3600
@@ -235,22 +239,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "성공적으로 로그아웃 되었습니다."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "유효하지 않은 토큰입니다.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Unauthorized"
                                         }
                                     },
                                     "type": "object"

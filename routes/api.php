@@ -10,7 +10,7 @@ use App\Http\Middleware\JwtMiddleware;
 //로그인
 Route::post('/register', [AuthController::class, 'register'] );
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::get('/logout', [AuthController::class, 'logout']);
 
 //지역 라우팅
 Route::get('/regions', [RegionController::class, 'regions']);
@@ -41,5 +41,6 @@ Route::post('/regions/gallery/post/comments', [GalleryController::class, 'commen
 Route::delete('/regions/gallery/post/comments', [GalleryController::class, 'commentDelete'])->middleware(JwtMiddleware::class);
 Route::put('/regions/gallery/post/comments', [GalleryController::class, 'commentUpdate'])->middleware(JwtMiddleware::class);
 
-
+//통합 검색
+Route::get('/total/search', [GalleryController::class, 'viewComment']);
 ?>

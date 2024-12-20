@@ -155,8 +155,35 @@ class AuthController extends Controller
             'expires_in' => JWTAuth::factory()->getTTL() * 60, // TTL 값 가져오기
         ]);
     }
-
     
+    /**
+ * @OA\Post(
+ *     path="/api/logout",
+ *     summary="로그아웃",
+ *     description="현재 인증된 사용자의 JWT 토큰을 무효화합니다.",
+ *     tags={"Authentication"},
+ *     security={
+ *         {"bearerAuth": {}}
+ *     },
+ *     @OA\Response(
+ *         response=200,
+ *         description="성공적으로 로그아웃 되었습니다.",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="성공적으로 로그아웃 되었습니다.")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="유효하지 않은 토큰입니다.",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="error", type="string", example="Unauthorized")
+ *         )
+ *     )
+ * )
+ */
+
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());

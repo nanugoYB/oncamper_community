@@ -27,27 +27,19 @@ Route::delete('/regions/gallery', [GalleryController::class, 'galleryDelete'])->
 //게시글 라우팅
 Route::get('/regions/gallery/postList', [GalleryController::class, 'postList']);
 Route::get('/regions/gallery/post', [GalleryController::class, 'viewPost']);
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('/regions/gallery/post', [GalleryController::class, 'postAdd']);
-});
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::delete('/regions/gallery/post', [GalleryController::class, 'postDelete']);
-});
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::put('/regions/gallery/post', [GalleryController::class, 'postUpdate']);
-});
+
+Route::post('/regions/gallery/post', [GalleryController::class, 'postAdd'])->middleware(JwtMiddleware::class);
+Route::delete('/regions/gallery/post', [GalleryController::class, 'postDelete'])->middleware(JwtMiddleware::class);
+Route::put('/regions/gallery/post', [GalleryController::class, 'postUpdate'])->middleware(JwtMiddleware::class);
+
 
 
 //코멘트 라우팅
 Route::get('/regions/gallery/post/comments', [GalleryController::class, 'viewComment']);
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('/regions/gallery/post/comments', [GalleryController::class, 'commentAdd']);
-});
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::delete('/regions/gallery/post/comments', [GalleryController::class, 'commentDelete']);
-});
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::put('/regions/gallery/post/comments', [GalleryController::class, 'commentUpdate']);
-});
+
+Route::post('/regions/gallery/post/comments', [GalleryController::class, 'commentAdd'])->middleware(JwtMiddleware::class);
+Route::delete('/regions/gallery/post/comments', [GalleryController::class, 'commentDelete'])->middleware(JwtMiddleware::class);
+Route::put('/regions/gallery/post/comments', [GalleryController::class, 'commentUpdate'])->middleware(JwtMiddleware::class);
+
 
 ?>

@@ -109,6 +109,7 @@ class AuthController extends Controller
      *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGci..."),
      *             @OA\Property(property="token_type", type="string", example="bearer"),
      *             @OA\Property(property="user_id", type="int", example="1"),
+     *             @OA\Property(property="user_name", type="string", example="test_user_name"),
      *             @OA\Property(property="expires_in", type="integer", example=3600)
      *         )
      *     ),
@@ -152,6 +153,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'user_id' => $user->id,
+            'user_name' => $user->user_name,
             'expires_in' => JWTAuth::factory()->getTTL() * 60, // TTL 값 가져오기
         ]);
     }

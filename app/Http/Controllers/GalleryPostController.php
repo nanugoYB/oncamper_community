@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Models\GalleryPost;
 use Mews\Purifier\Purifier;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryPostController extends Controller
 {
@@ -340,6 +341,7 @@ class GalleryPostController extends Controller
             'content' => 'required'
         ]);
 
+
         if($validator->fails()) {
             $errors = $validator->errors();
 
@@ -373,6 +375,7 @@ class GalleryPostController extends Controller
                 ],422);
             }
         }
+
 
         //purifier를 통해서 content 내부의 위험요소 제거 (script, img의 src중 서버에 없는 src등)
         $content = $this->purifier->clean($request->input('content'));

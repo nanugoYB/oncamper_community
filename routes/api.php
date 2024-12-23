@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\GalleryPostController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\JWTAuthController;
 use App\Http\Middleware\JwtMiddleware;
 
@@ -25,21 +27,21 @@ Route::delete('/regions/gallery', [GalleryController::class, 'galleryDelete'])->
 
 
 //게시글 라우팅
-Route::get('/regions/gallery/postList', [GalleryController::class, 'postList']);
-Route::get('/regions/gallery/post', [GalleryController::class, 'viewPost']);
+Route::get('/regions/gallery/postList', [GalleryPostController::class, 'postList']);
+Route::get('/regions/gallery/post', [GalleryPostController::class, 'viewPost']);
 
-Route::post('/regions/gallery/post', [GalleryController::class, 'postAdd'])->middleware(JwtMiddleware::class);
-Route::delete('/regions/gallery/post', [GalleryController::class, 'postDelete'])->middleware(JwtMiddleware::class);
-Route::put('/regions/gallery/post', [GalleryController::class, 'postUpdate'])->middleware(JwtMiddleware::class);
+Route::post('/regions/gallery/post', [GalleryPostController::class, 'postAdd'])->middleware(JwtMiddleware::class);
+Route::delete('/regions/gallery/post', [GalleryPostController::class, 'postDelete'])->middleware(JwtMiddleware::class);
+Route::put('/regions/gallery/post', [GalleryPostController::class, 'postUpdate'])->middleware(JwtMiddleware::class);
 
 
 
 //코멘트 라우팅
-Route::get('/regions/gallery/post/comments', [GalleryController::class, 'viewComment']);
+Route::get('/regions/gallery/post/comments', [CommentController::class, 'viewComment']);
 
-Route::post('/regions/gallery/post/comments', [GalleryController::class, 'commentAdd'])->middleware(JwtMiddleware::class);
-Route::delete('/regions/gallery/post/comments', [GalleryController::class, 'commentDelete'])->middleware(JwtMiddleware::class);
-Route::put('/regions/gallery/post/comments', [GalleryController::class, 'commentUpdate'])->middleware(JwtMiddleware::class);
+Route::post('/regions/gallery/post/comments', [CommentController::class, 'commentAdd'])->middleware(JwtMiddleware::class);
+Route::delete('/regions/gallery/post/comments', [CommentController::class, 'commentDelete'])->middleware(JwtMiddleware::class);
+Route::put('/regions/gallery/post/comments', [CommentController::class, 'commentUpdate'])->middleware(JwtMiddleware::class);
 
 //통합 검색
 Route::get('/total/search', [GalleryController::class, 'viewComment']);

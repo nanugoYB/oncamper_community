@@ -6,6 +6,7 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GalleryPostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\JWTAuthController;
 use App\Http\Middleware\JwtMiddleware;
 
@@ -31,6 +32,8 @@ Route::get('/regions/gallery/postList', [GalleryPostController::class, 'postList
 Route::get('/regions/gallery/post', [GalleryPostController::class, 'viewPost']);
 
 Route::post('/regions/gallery/post', [GalleryPostController::class, 'postAdd'])->middleware(JwtMiddleware::class);
+//이미지 업로드
+Route::post('/regions/gallery/postImage', [ImageController::class, 'uploadImage'])->middleware(JwtMiddleware::class);
 Route::delete('/regions/gallery/post', [GalleryPostController::class, 'postDelete'])->middleware(JwtMiddleware::class);
 Route::put('/regions/gallery/post', [GalleryPostController::class, 'postUpdate'])->middleware(JwtMiddleware::class);
 
@@ -39,7 +42,7 @@ Route::put('/regions/gallery/post', [GalleryPostController::class, 'postUpdate']
 //코멘트 라우팅
 Route::get('/regions/gallery/post/comments', [CommentController::class, 'viewComment']);
 
-Route::post('/regions/gallery/post/comments', [CommentController::class, 'commentAdd'])->middleware(JwtMiddleware::class);
+Route::post('/regions/gallery/post/comments', [CommentController::class, 'commentAdd']);
 Route::delete('/regions/gallery/post/comments', [CommentController::class, 'commentDelete'])->middleware(JwtMiddleware::class);
 Route::put('/regions/gallery/post/comments', [CommentController::class, 'commentUpdate'])->middleware(JwtMiddleware::class);
 

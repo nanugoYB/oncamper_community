@@ -1650,6 +1650,74 @@
                 }
             }
         },
+        "/api/upload-image": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "이미지 업로드",
+                "description": "이미지 파일을 업로드하고 해당 파일의 URL을 반환합니다.",
+                "operationId": "66f879b0ddc5276c2d711d8dba82217e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "description": "업로드할 이미지 파일",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "업로드 성공",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "url": {
+                                            "description": "업로드된 이미지의 URL",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "유효하지 않은 요청",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "에러 메시지",
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "description": "상세한 검증 에러 정보",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/regions": {
             "get": {
                 "tags": [
@@ -1727,6 +1795,10 @@
         {
             "name": "Gallery Posts",
             "description": "Gallery Posts"
+        },
+        {
+            "name": "Image",
+            "description": "Image"
         },
         {
             "name": "Regions",
